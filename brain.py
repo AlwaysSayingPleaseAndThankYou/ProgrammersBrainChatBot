@@ -33,8 +33,9 @@ llm = ChatOpenAI(temperature=0.2, model="gpt-3.5-turbo-0613")
 embeddings_model = OpenAIEmbeddings()
 
 text_splitter = CharacterTextSplitter(
-    chunk_size=512,
-    chunk_overlap=20,
+    separator='\n',
+    chunk_size=10000,
+    chunk_overlap=2000,
     length_function=len,
     add_start_index=True,
 )
