@@ -70,9 +70,7 @@ class CustomPromptTemplate(StringPromptTemplate):
         # Format them in a particular way
         intermediate_steps = kwargs.pop("intermediate_steps")
         thoughts = ""
-        if not intermediate_steps:
-            pass
-        else:
+        if intermediate_steps:
             for action, observation in intermediate_steps:
                 thoughts += action.log
                 thoughts += f"\nObservation: {observation}\nThought: "
