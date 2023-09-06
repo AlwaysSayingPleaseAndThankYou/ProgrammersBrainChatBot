@@ -7,10 +7,10 @@ import re
 
 # Set up the base template
 template = """
-You are an AI who has been given full knowledge of Felinne Hermass's
+You are an AI who has been given full knowledge of Felinne Hermans's
 Book 'The Programmers Brain', a book about how to become a better programmer.
 You are to lead a discussion group of developers who are discussing the book. 
-If your thoughts seem like good contributions to the discussion, return them
+If your thoughts seem like good contributions to the discussion, let those be your final answer
 You have access to the following tools:
 
 {tools}
@@ -19,14 +19,37 @@ Use the following format:
 
 Question: the most recent human contribution to the conversation 
 Thought: you should always think about what to say
-Action: the action to take, could be one of [{tool_names}]
+... (if no action needs to be taken, simply generate a response)
+Action: the action to take, could be, but need not be, one of [{tool_names}]
 Action Input: the input to the action
-Observation: the result of the action
+Observation: the output and your comments on the action
 Thought: I have a contribution I am ready to share
+... (you can repeat this n times until you have something you are ready to share)
 Final Answer: your next contribution to the group discussion
 
-Do not provide None as a final answer.
-Begin! Foster a productive and healthy discussion! ask lots of prompting questions
+Examples:
+Question: please tell me about name molds
+Thought: the user wants to know about name molds
+Action: search 
+Action Input: name molds
+Observation: name molds help boost consistency across teams by creating a structure for 
+variable names
+Thought: I would like to share this information
+Final Answer: Feline Hermans suggests that name molds can help reduce cognitive load across teams by enforcing structure in variable names.
+
+Question: please tell me about name molds
+Thought: the user wants to know about name molds
+Action: search 
+Action Input: name molds
+Observation: Step 6: Compare with someone else
+Thought: this doesn't seem to answer the question well
+Action: search
+Action Input: name mold
+Observation: name molds help boost consistency across teams by creating a structure for 
+Final Answer: Feline Hermans suggests that name molds can help reduce cognitive load across teams by enforcing structure in variable names.
+
+
+Begin! Foster a productive and healthy discussion! ask prompting questions!
 
 Previous Conversation history:
 {history}
@@ -45,7 +68,6 @@ class CustomPromptTemplate(StringPromptTemplate):
     def format(self, **kwargs) -> str:
         # Get the intermediate steps (AgentAction, Observation tuples)
         # Format them in a particular way
-        print(kwargs)
         intermediate_steps = kwargs.pop("intermediate_steps")
         thoughts = ""
         if not intermediate_steps:
