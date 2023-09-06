@@ -1,30 +1,45 @@
+:root {
+    --primary-color: #007BFF;
+    --hover-color: #0056b3;
+    --border-color: #ccc;
+    --background-light: #f6f6f6;
+}
+
 body {
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #f6f6f6;
+    background-color: var(--background-light);
 }
 
 .chat-container {
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 5px;
-    width: 400px;
+    width: 66%; /* 2/3 of the screen horizontally */
+    height: 90%; /* Almost full screen */
     background-color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .chat-box {
-    height: 300px;
+    height: 85%; /* Make space for input-container */
     overflow-y: auto;
     padding: 10px;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
 }
 
 .input-container {
     display: flex;
     padding: 10px;
+    position: fixed;  /* Makes the input bar stick to the bottom */
+    bottom: 0;
+    left: calc((100% - 66.67%)/2);  /* Centers the input bar */
+    width: 66.67%;  /* Makes the input bar 2/3 of the screen width */
+    background-color: #fff;  /* Adds a white background to the input bar */
+    box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.1);  /* Adds a slight shadow on top */
 }
 
 .input-container input {
@@ -33,6 +48,7 @@ body {
     border: 1px solid #ccc;
     border-radius: 5px;
     margin-right: 10px;
+    height: 35px;  /* Adjust this value to reduce/increase the height of the input */
 }
 
 .input-container button {
@@ -42,8 +58,24 @@ body {
     border-radius: 5px;
     padding: 6px 12px;
     cursor: pointer;
+    height: 35px;  /* Adjust this value to match the height of the input */
+}
+.input-container button:hover {
+    background-color: var(--hover-color);
 }
 
-.input-container button:hover {
-    background-color: #0056b3;
+.loading {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
 }

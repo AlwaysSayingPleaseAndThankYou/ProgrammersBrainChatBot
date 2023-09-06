@@ -1,48 +1,39 @@
-//async function askBot() {
-//    const inputElement = document.getElementById("userInput");
-//    const chatBox = document.getElementById("chatBox");
-//
-//    // Display user's question
-//    chatBox.innerHTML += `<div>User: ${inputElement.value}</div>`;
-//    const Question = {
-//        question: inputElement.value
-//    };
-//    const q = JSON.stringify(Question);
-//    console.log(q);
-//    const response = await fetch('/ask', {
-//        method: 'POST',
-//        headers: {
-//            'Content-Type': 'application/x-www-form-urlencoded',
-//        },
-//        body: JSON.stringify(Question)
-//    });
-//
-//    const data = await response.json();
-//
-//    // Display bot's answer
-//    chatBox.innerHTML += `<div>Bot: ${data.answer}</div>`;
-//
-//    // Clear input
-//    inputElement.value = "";
-//}
+function scrollToBottom() {
+    const chatBox = document.getElementById("chatBox");
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
 async function askBot() {
     const inputElement = document.getElementById("userInput");
     const chatBox = document.getElementById("chatBox");
+    const loadingElement = document.getElementById("loading");
 
     chatBox.innerHTML += `<div style="text-align: right; margin: 5px 0;">You: ${inputElement.value}</div>`;
+    loadingElement.style.display = "block";
 
-    const response = await fetch(`/ask?question=${encodeURIComponent(inputElement.value)}`, {
-        method: 'POST',
-    });
+    try {
+        const response = await fetch(`/ask?question=${encodeURIComponent(inputElement.value)}`, {
+            method: 'POST',
+        });
 
-    const data = await response.json();
+        if (response.ok) {
+            const data = await response.json();
+            chatBox.innerHTML += `<div style="text-align: left; margin: 5px 0;">Bot: ${data.answer}</div>`;
+        } else {
+            console.error("Error:", response.statusText);
+            chatBox.innerHTML += `<div style="text-align: left; margin: 5px 0;">Bot: Sorry, I couldn't process that request.</div>`;
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        chatBox.innerHTML += `<div style="text-align: left; margin: 5px 0;">Bot: Oops, something went wrong.</div>`;
+    }
 
-    chatBox.innerHTML += `<div style="text-align: left; margin: 5px 0;">Bot: ${data.answer}</div>`;
     inputElement.value = "";
-    chatBox.scrollTop = chatBox.scrollHeight;
+    loadingElement.style.display = "none";
+    scrollToBottom();
 }
+
 document.getElementById("userInput").addEventListener("keyup", function(event) {
-    // Check if the key pressed is "Enter"
     if (event.key === "Enter") {
         askBot();
     }
