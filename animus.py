@@ -4,6 +4,11 @@ from langchain import OpenAI, SerpAPIWrapper, LLMChain
 from typing import List, Union
 from langchain.schema import AgentAction, AgentFinish, OutputParserException
 import re
+import logging
+brain_log = logging.getLogger('__name__')
+file_handler = logging.FileHandler('logfile.log')
+brain_log.addHandler(file_handler)
+brain_log.setLevel(logging.INFO)
 
 # Set up the base template
 template = """
@@ -19,8 +24,9 @@ Use the following format:
 
 Question: the most recent human contribution to the conversation 
 Thought: you should always think about what to say
-... (if no action needs to be taken, simply generate a response)
-Action: the action to take, could be, but need not be, one of [{tool_names}]
+... (if no action needs to be taken, simply go to Final Response)
+Action: the action to take, could be, but need not be, one of [{tool_names}] if no tool seems right
+give your Final Answer
 Action Input: the input to the action
 Observation: the output and your comments on the action
 Thought: I have a contribution I am ready to share
@@ -68,6 +74,7 @@ class CustomPromptTemplate(StringPromptTemplate):
     def format(self, **kwargs) -> str:
         # Get the intermediate steps (AgentAction, Observation tuples)
         # Format them in a particular way
+        brain_log.info(kwargs)
         intermediate_steps = kwargs.pop("intermediate_steps")
         thoughts = ""
         if intermediate_steps:
@@ -87,6 +94,7 @@ class CustomOutputParser(AgentOutputParser):
 
     def parse(self, llm_output: str) -> Union[AgentAction, AgentFinish]:
         # Check if agent should finish
+        brain_log.info(llm_output)
         if "Final Answer:" in llm_output:
             return AgentFinish(
                 # Return values is generally always a dictionary with a single `output` key
@@ -102,4 +110,5 @@ class CustomOutputParser(AgentOutputParser):
         action = match.group(1).strip()
         action_input = match.group(2)
         # Return the action and action input
-        return AgentAction(tool=action, tool_input=action_input.strip(" ").strip('"'), log=llm_output)
+        action = AgentAction(tool=action, tool_input=action_input.strip(" ").strip('"'), log=llm_output)
+        return action
